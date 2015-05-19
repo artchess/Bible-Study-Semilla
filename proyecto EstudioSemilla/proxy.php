@@ -1,5 +1,5 @@
 <?php 
-  $token = '3lSIKdsxHOee2qD3Cd9AagWs33tEHDOjvujDlI2n'; //<----- produccion : 80VHkSjIUTgrJUyx4cmXpUgb6g9JO6mkVWT3JO6K
+  $token = '3lSIKdsxHOee2qD3Cd9AagWs33tEHDOjvujDlI2n'; 
   $params = $_GET['pasaje'];
   
   $params = str_replace(' ', '+', $params);
