@@ -12,5 +12,5 @@ JQuery Pluggins used:
 API for the Bible (the version in this application is RV60, there are others):
 * http://es.bibles.org/pages/api
 
-API for email sending via Javascript free!:
+API for email sending via Javascript (first 12,000 emails per month are free):
 * https://mandrill.com
