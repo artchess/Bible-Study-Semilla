@@ -1,0 +1,349 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <!-- estilos -->
+    <link href="css/jquery.wysiwyg.css" rel="stylesheet" />
+    <link href="css/stylesStudioBiblia.css" rel="stylesheet" />
+    <link href="css/farbtastic.css" rel="stylesheet" />
+    <!-- script -->
+    <!-- el siguiente script es de jquery, este no va en semillamexico.com -->
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="js/farbtastic/farbtastic.js"></script>
+    <script src="js/wysiwyg/jquery.wysiwyg.js"></script>
+    <script src="js/wysiwyg/wysiwyg.i18n.js"></script>
+    <script src="js/wysiwyg/lang.es.js"></script>
+    <script src="js/wysiwyg/wysiwyg.rmFormat.js"></script>
+    <script src="js/wysiwyg/wysiwyg.colorpicker.js"></script>
+    <script src="js/wordexport/FileSaver.js"></script>
+    <script src="js/wordexport/jquery.wordexport.js"></script>
+</head>
+<body>
+    <div class="contenedor-estudio">
+        <div id="div-biblia-estudio">
+            <div class="toolbox-biblia-estudio">
+                <label>Pasaje(s): </label>
+                <!-- Pasaje Biblico Inicial -->
+                <input id="passage-biblia-estudio" type="text" value="juan 3:1-5, juan 1:20-2:2"/>
+                <!-- Titulo documento de Word -->
+                <input id="hdn-titulo-word" type="hidden" value="Josue: No atendieron la voz de Dios. Juan 3:1-5" />
+                <!-- Id nota único (para guardar) -->
+                <input id="hdn-idnote" type="hidden" value="123" />
+            </div>
+            <div id="biblia-estudio">
+                <div class="innerDetails"><div style="text-align:center;"><img src="/images/loading_small.gif" /><br/>Espere un momento...</div></div>
+            </div>
+        </div>
+        <div id="div-editor-estudio" class="div-editor">
+            <textarea id="wysiwyg" style="width:100%; height:100%"></textarea>
+        </div>
+    </div>
+    <div id="hdn-word-temp" style="display:none;">
+        <!-- Contenido inicial -->
+        <p><span style="background-color: rgb(255, 255, 255);"><span style="background-color: rgb(251, 245, 19);"><strong><big><big><small>Génesis 1</small></big></big></strong></span><br>De la serie de: Génesis - 2009<br><i>Pastor:</i><em> <font color="#000bc2">Fermin IV</font></em></span></p><br />
+    </div>
+    <script type="text/javascript">
+
+        // Local storage functions
+        var saveTimeout = 0;
+        var timerRunning = false;
+        var saveNoteID = "note";
+        var saveTitleID = "noteTitle";
+        var notesChanged = false;
+
+        function saveData() {
+            var saveFieldVal = $('#wysiwyg').val();
+            var currentTime = new Date()
+            var hours = currentTime.getHours()
+            var minutes = currentTime.getMinutes()
+            if (minutes < 10) {
+                minutes = "0" + minutes
+            }
+            var strCurTime = "";
+            if (hours > 11) {
+                if (hours > 12) { hours -= 12 }
+                strCurTime += hours + ":" + minutes + " ";
+                strCurTime += "PM"
+            } else {
+                strCurTime += hours + ":" + minutes + " ";
+                strCurTime += "AM"
+            }
+            localStorage.setItem(saveNoteID, saveFieldVal);
+            localStorage.setItem(saveTitleID, $('#hdn-titulo-word').val());
+            $('div.wysiwyg ul.toolbar li.save').css('opacity', '.3');
+            $('#lastSaved').text('Guardado ' + strCurTime + '');
+            clearTimeout(saveTimeout);
+            timerRunning = false;
+            notesChanged = false;
+        }
+        function autoSave() {
+            if (!timerRunning) {
+                $('div.wysiwyg ul.toolbar li.save').css('opacity', '.85');
+                saveTimeout = setTimeout(saveData, 30000);
+                timerRunning = true;
+                notesChanged = true;
+            }
+        }
+        function loadData() {
+            if (localStorage.getItem(saveNoteID) != null && localStorage.getItem(saveNoteID) != "") {
+                $('#wysiwyg').val(localStorage.getItem(saveNoteID));
+                $('#wysiwyg').wysiwyg("setContent", localStorage.getItem(saveNoteID));
+            }
+        }
+        function byebyewin() {
+            if (notesChanged) {
+                return "Tus notas no estan guardadas. ¿Deseas cerrar la página?";
+            }
+        }
+
+        function validateEmail(email) {
+            var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+            return re.test(email);
+        }
+
+        window.onbeforeunload = byebyewin;
+
+        jQuery(function ($) {
+
+            saveNoteID = "note_" + $('#hdn-idnote').val();
+            saveTitleID = "noteTitle_" + $('#hdn-idnote').val();
+
+            $('#wysiwyg').wysiwyg({
+                plugins: {
+                    //autoload: true,
+                    i18n: { lang: "es" },
+                    rmFormat: { rmMsWordMarkup: true }
+                },
+                controls: {
+                    insertHorizontalRule: {
+                        visible: false,
+                        tooltip: 'Insertar regla horizontal'
+                    },
+                    createLink: { visible: false },
+                    insertImage: { visible: false },
+                    insertTable: { visible: false },
+                    code: { visible: false },
+                    undo: {
+                        visible: true,
+                        tooltip: 'Deshacer'
+                    },
+                    redo: {
+                        visible: true,
+                        tooltip: 'Rehacer'
+                    },
+                    superscript: { visible: false },
+                    subscript: { visible: false },
+                    removeFormat: {
+                        visible: true,
+                        tooltip: 'Quitar formato'
+                    },
+                    unLink: { visible: false },
+                    h1: { visible: false },
+                    h2: { visible: false },
+                    h3: { visible: false },
+                    increaseFontSize: {
+                        visible: true,
+                        tooltip: 'Incrementar tamaño de texto'
+                    },
+                    decreaseFontSize: {
+                        visible: true,
+                        tooltip: 'Decrementar tamaño de texto'
+                    },
+                    paragraph: {
+                        visible: false
+                    },
+                    bold: {
+                        tooltip: 'Negritas'
+                    },
+                    italic: {
+                        tooltip: 'Italica'
+                    },
+                    strikeThrough: {
+                        tooltip: 'Tachado'
+                    },
+                    underline: {
+                        tooltip: 'Subrayado'
+                    },
+                    underline: {
+                        tooltip: 'Subrayado'
+                    },
+                    justifyLeft: {
+                        tooltip: 'Texto alineado a la izquierda'
+                    },
+                    justifyCenter: {
+                        tooltip: 'Texto alineado al centro'
+                    },
+                    justifyRight: {
+                        tooltip: 'Texto alineado a la derecha'
+                    },
+                    justifyFull: {
+                        tooltip: 'Texto justificado'
+                    },
+                    indent: {
+                        tooltip: 'Sangría'
+                    },
+                    outdent: {
+                        tooltip: 'Anular sangría'
+                    },
+                    insertOrderedList: {
+                        tooltip: 'Insertar lista ordenada'
+                    },
+                    insertUnorderedList: {
+                        tooltip: 'Insertar lista de viñetas'
+                    },
+                    print: {
+                        groupIndex: 12,
+                        visible: true,
+                        exec: function () {
+                            $('#wysiwyg-wysiwyg-iframe')[0].contentWindow.focus();
+                            $('#wysiwyg-wysiwyg-iframe')[0].contentWindow.print();
+                        },
+                        className: 'print',
+                        tooltip: 'Imprimir'
+                    },
+                    email: {
+                        groupIndex: 13,
+                        visible: true,
+                        exec: function () {
+
+                            $('#hdn-word-temp').html($('#wysiwyg').wysiwyg("getContent"));
+
+                            var email = prompt("Por favor escribe tu correo:", "correo@correo.com");
+                            
+                            if (validateEmail(email)) {
+                                // aqui mando el correo, estoy usando Mandrill para enviarlo. https://mandrill.com
+                                $.ajax({
+                                    type: 'POST',
+                                    url: 'https://mandrillapp.com/api/1.0/messages/send.json',
+                                    data: {
+                                        'key': 'ri_LYb2NlDk4h2P_9Ys4Nw',
+                                        'message': {
+                                            'from_email': 'mexico@semillamexico.com',
+                                            'to': [
+                                                {
+                                                    'email': email,
+                                                    'name': '',
+                                                    'type': 'to'
+                                                }//,
+                                                //{
+                                                //    'email': 'RECIPIENT_NO_2@EMAIL.HERE',
+                                                //    'name': 'ANOTHER RECIPIENT NAME (OPTIONAL)',
+                                                //    'type': 'to'
+                                                //}   
+                                            ],
+                                            'autotext': 'true',
+                                            'subject': 'Notas de: ' + $('#hdn-titulo-word').val(),
+                                            'html': $('#hdn-word-temp').html() //'YOUR EMAIL CONTENT HERE! YOU CAN USE HTML!'
+                                        }
+                                    },
+                                    error: function (xhr, ajaxOptions, thrownError) {
+                                        alert('Error, el correo no se envió');
+                                    },
+                                    success: function (response) {
+                                        console.log(response); // if you're into that sorta thing
+
+                                        if (response[0].status != 'sent')
+                                            alert('Error, el correo no se envió');
+                                        else
+                                            alert('El correo se envió correctamente');
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                alert('No se envió el correo, verifica que lo hayas escrito correctamente');
+                            }
+
+                        },
+                        className: 'email',
+                        tooltip: 'Email'
+                    },
+                    save: {
+                        groupIndex: 11,
+                        visible: true,
+                        exec: function () {
+                            saveData();
+                        },
+                        className: 'save',
+                        tooltip: 'Salvar'
+                    },
+                    word: {
+                        groupIndex: 14,
+                        visible: true,
+                        exec: function () {
+                            $('#hdn-word-temp').html($('#wysiwyg').wysiwyg("getContent"));
+                            $('#hdn-word-temp').wordExport($('#hdn-titulo-word').val());
+                        },
+                        className: 'word',
+                        tooltip: 'Exportar a Word'
+                    },
+                    colorpicker: {
+                        groupIndex: 10,
+                        visible: true,
+                        css: {
+                            "color": function (cssValue, Wysiwyg) {
+                                var document = Wysiwyg.innerDocument(),
+									defaultTextareaColor = $(document.body).css("color");
+                                if (cssValue !== defaultTextareaColor) {
+                                    return true;
+                                }
+                                return false;
+                            }
+                        },
+                        exec: function () {
+                            if ($.wysiwyg.controls.colorpicker) {
+                                $.wysiwyg.controls.colorpicker.init(this);
+                            }
+                        },
+                        tooltip: "Selector de Color"
+                    },
+                },
+                initialContent: $('#hdn-word-temp').html(),
+                events: { keyup: autoSave, change: autoSave }
+            });
+
+            $('.wysiwyg .toolbar').append("<li id='lastSaved' style='color: white; width: 90px;' />");
+
+            loadData(); // si hay algo guardado en localStorage lo pinta... esto sobreescribe el contenido inicial
+
+            $('#passage-biblia-estudio').change(function (evt) {
+
+                $('#biblia-estudio').html('<div class="innerDetails"><div style="text-align:center;"><img src="/images/loading_small.gif" /><br/>Espere un momento...</div></div>');
+
+                $.ajax
+                  ({
+                      type: "GET",
+                      url: "proxy.php?pasaje=" + $('#passage-biblia-estudio').val(), 
+                      dataType: 'json',
+                      error: function (xhr, ajaxOptions, thrownError) {
+                          console.log(thrownError);
+                          $('#biblia-estudio').html('<p style="color:red">No se pudo obtener la respuesta del pasaje bíblico. Por favor vuelve a intentarlo, si este error continua favor de notificalo a art_chess@hotmail.com</p>')
+                      },
+                      success: function (data) {
+                          //console.log(data);
+                          $('#biblia-estudio').html('');
+                          if (data.response.search.result.passages.length > 0) {
+                              $.each(data.response.search.result.passages, function (index, value) {
+                                  $('#biblia-estudio').append('<p><b>' + value.display + '</b><small>  (' + value.version_abbreviation + ')</small></p>');
+                                  $('#biblia-estudio').append(value.text);
+                              });
+
+                              $('#biblia-estudio').append('<div align="center"><small>' + data.response.search.result.passages[0].copyright + '</small></div>');
+                          }
+                          else
+                          {
+                              $('#biblia-estudio').append('<p>No se encontró el pasaje. Revise que lo haya escrito correctamente.</p>');
+                          }
+
+                          // to make stuff like a real christian.
+                          //$('body').append(data.response.meta.fums); // this doesnt work, it reloads the page with no result.
+                          $('body').append(data.response.meta.fums_noscript);
+                      }
+                  });
+            }).trigger('change');
+
+        });
+    </script>
+</body>
+</html>

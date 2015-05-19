@@ -1,0 +1,45 @@
+﻿
+.contenedor-estudio{
+    width:100%;
+    height: 480px;
+    /*margin-top: 14px;*/
+    position:relative;
+    /*background-color:red;*/
+}
+
+#div-biblia-estudio{
+    padding: 0px;  
+    width: 39%;
+    height: 100%;
+    float:left;
+    /*margin: 10px 0;*/
+    border: 1px solid black; 
+    overflow:hidden;
+}
+
+.div-editor{
+    display:block;
+    float:right;
+    height:100%;
+    /*padding: 7px 5px;*/
+    position: relative;
+    width:60%;
+    /*border: 1px solid orange;*/
+}
+
+.toolbox-biblia-estudio{
+    background-color: #333333;
+    color: white;
+    font-weight: bold;
+    padding: 6px;
+    width: 98%;
+}
+
+#biblia-estudio {
+    overflow-y: scroll;
+    height: 93%;
+}
+
+#passage-biblia-estudio{
+    width:50%;
+}
