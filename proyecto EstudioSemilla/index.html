@@ -99,12 +99,40 @@
 
         function validateEmail(email) {
             var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-            return re.test(email);
+            var test = re.test(email)
+            if(!test)
+                alert('El correo no es válido');
+            return test;
         }
+
+        function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
 
         window.onbeforeunload = byebyewin;
 
         jQuery(function ($) {
+
+            // saco los parametros
+            //var passage = getUrlParameter('passage');
+            //var title = getUrlParameter('title');
+            //var id = getUrlParameter('id');
+
+            //$('#passage-biblia-estudio').val(passage);
+            //$('#hdn-titulo-word').val(title);
+            //$('#hdn-idnote').val(id);
+
 
             saveNoteID = "note_" + $('#hdn-idnote').val();
             saveTitleID = "noteTitle_" + $('#hdn-idnote').val();
@@ -211,7 +239,7 @@
 
                             var email = prompt("Por favor escribe tu correo:", "correo@correo.com");
                             
-                            if (validateEmail(email)) {
+                            if (email && validateEmail(email)) {
                                 // aqui mando el correo, estoy usando Mandrill para enviarlo. https://mandrill.com
                                 $.ajax({
                                     type: 'POST',
@@ -249,10 +277,6 @@
                                             alert('El correo se envió correctamente');
                                     }
                                 });
-                            }
-                            else
-                            {
-                                alert('No se envió el correo, verifica que lo hayas escrito correctamente');
                             }
 
                         },
@@ -302,6 +326,8 @@
                 initialContent: $('#hdn-word-temp').html(),
                 events: { keyup: autoSave, change: autoSave }
             });
+
+            $('.wysiwyg').attr("style", "");
 
             $('.wysiwyg .toolbar').append("<li id='lastSaved' style='color: white; width: 90px;' />");
 
